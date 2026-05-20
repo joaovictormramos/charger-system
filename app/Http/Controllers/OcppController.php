@@ -2,49 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Charger;
+use App\Models\RfidCard;
+use App\Models\Tag;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class OcppController extends Controller
 {
+    private const MINIMUM_BALANCE = 2000;
+    private const ALLOWED_ACTIONS = [
+        'Authorize',
+        'BootNotification',
+        'Heartbeat',
+        'MeterValues',
+        'StartTransaction',
+        'StatusNotification',
+        'StopTransaction'
+    ];
+
     public function handle(Request $request)
     {
         $action = $request->input('action');
         $chargerId = $request->input('charger_id');
         $payload = $request->input('payload');
 
-        if (method_exists($this, $action)) {
+        if (in_array($action, self::ALLOWED_ACTIONS) && method_exists($this, $action)) {
             return $this->$action($chargerId, $payload);
         }
 
         return response()->json(['status' => 'NotImplemented'], 404);
     }
 
-    private function BootNotification(): Response
+    private function Authorize($chargerId, $payload): array
     {
-        return [
-            'currentTime' => now(),
-            'interval' => 60,
-            'status' => 'Accepted'
-        ]
-    }
+        $rfidCard = RfidCard::where('uuid', $payload['idTag'])->first();
 
-    private function HeartBeat(): Response
-    {
-        return [
-        ]
-    }
-
-    private function ChangeNotification: Response
-    {
-        return [
-        ];
-    }
-
-    private function Authorize($charger, $payload): Response
-    {
-        $tag = Tag::where('idTag', $payload['idTag'])->first();
-
-        if ($tag && $tag->balance >= 2000) {
+        if ($rfidCard && $rfidCard->active && $rfidCard->balance >= self::MINIMUM_BALANCE) {
             return ['idTagInfo' =>
                 [
                     'status' => 'Accepted'
@@ -56,34 +51,134 @@ class OcppController extends Controller
             [
                 'status' => 'Invalid'
             ]
+        ];
     }
 
-    private function StartTransaction(): Response
+    private function BootNotification($chargerId, $payload): array
     {
-        $transaction = new Transaction::create([
-            'charger_id' => $chargerId,
-            'id_tag' => $payload['idTag'],
-            'meter_start' => $payload['meterValue']
+        Charger::where('identifier', $chargerId)->update([
+            'status' => 'Available',
+            'last_heartbeat' => now(),
+        ]);
+        
+        return [
+            'currentTime' => now(),
+            'interval' => 60,
+            'status' => 'Accepted'
+        ];
+    }
+
+    private function Heartbeat($chargerId, $payload): array
+    {
+        Charger::where('identifier', $chargerId)->update([
+            'last_heartbeat' => now(),
+        ]);
+        
+        return [
+            'currentTime' => now()
+        ];
+    }
+     
+    private function MeterValues($chargerId, $payload): array
+    {
+        $transactionId = $payload['transactionId'] ?? null;
+     
+        if (!$transactionId) {
+           return [];
+        }
+        $meterValue = collect($payload['meterValue'])->last();
+
+        $energySample = collect($meterValue['sampledValue'])
+            ->firstWhere('measurand', 'Energy.Active.Import.Register');
+        if (!$energySample) {
+            return [];
+        }
+
+        $transaction = Transaction::find($transactionId);
+        if (!$transaction) {
+           return [];
+        }
+
+        $currentMeter = (int) $energySample['value'];
+        $energyKwh = ($currentMeter - $transaction->meter_start) / 1000;
+
+        $transaction->update([
+            'energy_kwh' => $energyKwh,
         ]);
 
+        return [];
+    }
+
+    private function StartTransaction($chargerId, $payload): array
+    {
+        $charger = Charger::where('identifier', $chargerId)->first();
+        $rfidCard = RfidCard::where('uuid', $payload['idTag'])->first();
+        $auth = $this->Authorize($chargerId, $payload);
+    
+        if (!$charger || !$rfidCard) {
+            return [
+                'idTagInfo' => ['status' => 'Invalid'],
+                'transactionId' => 0
+            ];
+        }
+
+        if ($auth['idTagInfo']['status'] !== 'Accepted') {
+            return [
+                'idTagInfo' => $auth['idTagInfo'],
+                'transactionId' => 0
+            ];
+        }
+
+        $transaction = Transaction::create([
+            'charger_id' => $charger->id,
+            'rfid_card_id' => $rfidCard->id,
+            'meter_start' => $payload['meterStart']
+        ]);
+        
         return [
-            'idTagInfo' =>
-                [
-                    'status' $this->Authorize($charger, $payload),
-                ],
+            'idTagInfo' => $auth['idTagInfo'],
             'transactionId' => $transaction->id
         ];
     }
 
-    private function StopTransaction(): Response
+    private function StatusNotification($chargerId, $payload): array
     {
-        return [
-        ];
+        Charger::where('identifier', $chargerId)->update([
+            'status' => $payload['status'],
+        ]);
+
+        return [];
     }
 
-    private function MeterValues(): Response
+    private function StopTransaction($chargerId, $payload): array
     {
-        return [
-        ];
+        $transaction = Transaction::find($payload['transactionId']);
+
+        if (!$transaction) {
+            return ['idTagInfo' => ['status' => 'Invalid']];
+        }
+
+        $charger  = Charger::find($transaction->charger_id);
+        $rfidCard = RfidCard::find($transaction->rfid_card_id);
+
+        $meterStop  = (int) $payload['meterStop'];
+        $energyKwh  = ($meterStop - $transaction->meter_start) / 1000;
+        $totalCost  = (int) round($energyKwh * $charger->price_per_kwh);
+
+        $transaction->update([
+            'meter_stop'    => $meterStop,
+            'energy_kwh'    => $energyKwh,
+            'total_cost'    => $totalCost,
+            'end_time'      => $payload['timestamp'],
+            'stop_reason'   => $payload['reason'] ?? 'Local',
+        ]);
+
+        if ($rfidCard) {
+            $rfidCard->decrement('balance', $totalCost);
+        }
+
+        $charger->update(['status' => 'Available']);
+
+        return ['idTagInfo' => ['status' => 'Accepted']];
     }
 }

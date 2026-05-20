@@ -13,8 +13,17 @@ return new class extends Migration
     {
         Schema::create('chargers', function (Blueprint $table) {
             $table->id();
-	    $table->string('identifier');
-            $table->timestamps();
+	        $table->string('identifier')->unique();
+            $table->enum('status', [
+                'Available', 
+                'Preparing', 
+                'Charging', 
+                'Faulted', 
+                'Unavailable',
+            ])->default('Unavailable');
+            
+            $table->integer('price_per_kwh'); //cents
+            $table->timestamp('last_heartbeat')->nullable();
         });
     }
 
