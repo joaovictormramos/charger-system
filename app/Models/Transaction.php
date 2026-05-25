@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Transaction extends Model
 {
@@ -30,6 +31,7 @@ class Transaction extends Model
         'meter_stop',
         'energy_kwh',
         'total_cost',
+        'paid_amount',
         'stop_reason',
         'end_time',
     ];
@@ -42,5 +44,17 @@ class Transaction extends Model
     public function rfidCard(): BelongsTo
     {
         return $this->belongsTo(RfidCard::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($transaction) {
+            $transaction->uuid = Str::uuid();
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 }

@@ -13,19 +13,20 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignId('charger_id')
                 ->constrained('chargers')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-
 	        $table->foreignId('rfid_card_id')
+                ->nullable()
                 ->constrained('rfid_cards')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-
             $table->integer('meter_start')->nullable();
             $table->integer('meter_stop')->nullable();
             $table->integer('total_cost')->nullable(); //cents
+            $table->integer('paid_amount')->nullable(); //cents
             $table->decimal('energy_kwh', 10, 3)->nullable();
             $table->string('stop_reason')->nullable();
             $table->timestamp('start_time')->useCurrent();

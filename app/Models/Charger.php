@@ -21,4 +21,9 @@ class Charger extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'identifier';
+    }
 }

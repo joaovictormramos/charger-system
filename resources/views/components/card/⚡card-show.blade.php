@@ -9,6 +9,31 @@ new #[Layout('layouts.app')] class extends Component
     public RfidCard $rfidCard;
 
     public string $tab = 'recharge';
+    public int $amount = 0;
+    public bool $showPix = false;
+    public string $pixCode = '00020126580014br.gov.bcb.pix0136exemplo';
+
+    public function selectAmount(int $amount): void
+    {
+        $this->amount = $amount;
+        $this->showPix = false;
+    }
+
+    public function generatePix(): void
+    {
+        $this->showPix = true;
+        // aqui vai a integração com Abacatepay futuramente
+    }
+
+    public function fee(): int
+    {
+        return (int) round($this->amount * 0.01);
+    }
+
+    public function total(): int
+    {
+        return $this->amount + $this->fee();
+    }
 
     public function mount(RfidCard $rfidCard): void
     {
@@ -63,8 +88,75 @@ new #[Layout('layouts.app')] class extends Component
         @if($tab === 'recharge')
         <div class="p-4">
             <p class="text-sm text-gray-500 mb-3">Escolha um valor para recarregar</p>
-            {{-- valores e pix vêm na próxima etapa --}}
-            <p class="text-center text-gray-400 text-sm py-8">Em breve</p>
+
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                @foreach([2000, 5000, 10000, 20000] as $value)
+                <button wire:click="selectAmount({{ $value }})"
+                    class="py-3 rounded-xl text-sm font-medium border transition-colors
+                        {{ $amount === $value
+                            ? 'border-[#FF8400] bg-orange-50 text-orange-700'
+                            : 'border-gray-200 bg-white text-gray-700' }}">
+                    R$ {{ number_format($value / 100, 2, ',', '.') }}
+                </button>
+                @endforeach
+            </div>
+
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-sm text-gray-400 whitespace-nowrap">Outro valor</span>
+                <div class="relative flex-1">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">R$</span>
+                    <input type="number"
+                        wire:model.live="amount"
+                        placeholder="0,00"
+                        class="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#FF8400]">
+                </div>
+            </div>
+
+            @if($amount > 0)
+            <div class="border-t border-gray-100 pt-4 mb-4 space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Recarga</span>
+                    <span class="text-gray-800">R$ {{ number_format($amount / 100, 2, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Taxa de plataforma (1%)</span>
+                    <span class="text-gray-400">R$ {{ number_format($this->fee() / 100, 2, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between text-sm font-medium border-t border-gray-100 pt-2">
+                    <span class="text-gray-800">Total a pagar</span>
+                    <span class="text-gray-800">R$ {{ number_format($this->total() / 100, 2, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Saldo após recarga</span>
+                    <span class="text-orange-600 font-medium">R$ {{ number_format(($rfidCard->balance + $amount) / 100, 2, ',', '.') }}</span>
+                </div>
+            </div>
+
+            <button wire:click="generatePix"
+                class="w-full py-4 bg-[#FF8400] text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2">
+                <i class="ti ti-qrcode text-lg"></i>
+                Gerar Pix
+            </button>
+            @endif
+
+            @if($showPix)
+            <div class="mt-4 bg-gray-50 rounded-xl p-4 text-center">
+                <div class="w-32 h-32 bg-white border border-gray-200 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="ti ti-qrcode text-7xl text-gray-300"></i>
+                </div>
+                <p class="text-sm text-gray-400 mb-1">Total a pagar via Pix</p>
+                <p class="text-xl font-medium text-gray-800 mb-3">R$ {{ number_format($this->total() / 100, 2, ',', '.') }}</p>
+                <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
+                    <span class="text-xs text-gray-400 flex-1 truncate">{{ $pixCode }}</span>
+                    <button onclick="navigator.clipboard.writeText('{{ $pixCode }}')"
+                        class="text-xs text-gray-500 whitespace-nowrap flex items-center gap-1">
+                        <i class="ti ti-copy text-sm"></i> Copiar
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-3">Válido por <span class="font-medium text-gray-600">05:00</span></p>
+            </div>
+            @endif
+
         </div>
         @endif
 

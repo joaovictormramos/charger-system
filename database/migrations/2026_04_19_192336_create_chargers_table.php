@@ -21,7 +21,6 @@ return new class extends Migration
                 'Faulted', 
                 'Unavailable',
             ])->default('Unavailable');
-            
             $table->integer('price_per_kwh'); //cents
             $table->timestamp('last_heartbeat')->nullable();
         });
@@ -32,6 +31,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('chargers');
+        Schema::enableForeignKeyConstraints();
     }
 };

@@ -109,6 +109,11 @@ class OcppController extends Controller
         return [];
     }
 
+    private function RemoteStopTransaction($chargerId, $payload): array
+    {
+        return [];
+    }
+
     private function StartTransaction($chargerId, $payload): array
     {
         $charger = Charger::where('identifier', $chargerId)->first();
