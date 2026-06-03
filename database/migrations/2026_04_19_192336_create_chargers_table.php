@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('chargers', function (Blueprint $table) {
             $table->id();
 	        $table->string('identifier')->unique();
+            $table->string('name')->nullable();
+            $table->string('location')->nullable();
             $table->enum('status', [
                 'Available', 
                 'Preparing', 

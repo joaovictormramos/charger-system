@@ -9,9 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Charger extends Model
 {
     public $timestamps = false;
+
+    protected $casts = [
+        'last_heartbeat' => 'datetime',
+    ];
     
     protected $fillable = [
         'identifier',
+        'name',
+        'location',
         'status',
         'price_per_kwh',
         'last_heartbeat',

@@ -15,6 +15,7 @@ class ChargerSeeder extends Seeder
     {
         Charger::create([
             'identifier' => 'TENDA-60K-1',
+            'name' => 'TENDA-60K-1',
             'status' => 'Available',
             'price_per_kwh' => 99, // R$ 0,99
             'last_heartbeat' => now(),
@@ -22,6 +23,7 @@ class ChargerSeeder extends Seeder
 
         Charger::create([
             'identifier' => 'TENDA-30K-1',
+            'name' => 'TENDA-30K-1',
             'status' => 'Available',
             'price_per_kwh' => 99,
             'last_heartbeat' => now(),
@@ -29,6 +31,7 @@ class ChargerSeeder extends Seeder
 
         Charger::create([
             'identifier' => 'TENDA-30K-2',
+            'name' => 'TENDA-30K-2',
             'status' => 'Charging',
             'price_per_kwh' => 99,
             'last_heartbeat' => now(),
