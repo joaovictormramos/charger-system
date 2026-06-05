@@ -37,8 +37,8 @@ new #[Layout('layouts.app')] class extends Component
     {
         return [
             'energyKwh' => number_format($this->transaction->energy_kwh ?? 0, 2, ',', '.'),
-            'totalCost' => number_format(($this->transaction->total_cost ?? 0) / 100, 2, ',', '.'),
-            'paidAmount' => number_format(($this->transaction->paid_amount ?? 0) / 100, 2, ',', '.'),
+            'totalCost' => number_format($this->transaction->total_cost ?? 0, 2, ',', '.'),
+            'paidAmount' => number_format($this->transaction->paid_amount ?? 0, 2, ',', '.'),
         ];
     }
     
@@ -46,7 +46,7 @@ new #[Layout('layouts.app')] class extends Component
 ?>
 
 <div class="min-h-screen bg-white">
-
+    
     {{-- Header --}}
     <div class="bg-[#FF8400] px-4 pt-5 pb-6">
         <div class="flex items-center justify-between mb-5">
@@ -101,7 +101,7 @@ new #[Layout('layouts.app')] class extends Component
         <div class="bg-gray-50 rounded-xl px-4 py-3 mb-4">
             <div class="flex justify-between text-sm">
                 <span class="text-gray-400">Preço por kWh</span>
-                <span class="text-gray-800">R$ {{ number_format($transaction->charger->price_per_kwh / 100, 2, ',', '.') }}</span>
+                <span class="text-gray-800">R$ {{ number_format($transaction->charger->price_per_kwh, 2, ',', '.') }}</span>
             </div>
         </div>
 

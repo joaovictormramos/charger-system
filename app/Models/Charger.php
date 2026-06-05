@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,13 +24,20 @@ class Charger extends Model
         'last_heartbeat',
     ];
 
-    public function transactions(): HasMany
+    protected function casts(): array
     {
-        return $this->hasMany(Transaction::class);
+        return [
+            'price_per_kwh' => MoneyCast::class,
+        ];
     }
 
     public function getRouteKeyName(): string
     {
         return 'identifier';
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

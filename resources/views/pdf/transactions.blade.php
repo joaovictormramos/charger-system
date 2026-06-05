@@ -34,7 +34,7 @@
             <p class="label">kWh consumidos</p>
         </div>
         <div class="summary-box">
-            <p class="value">R$ {{ number_format($totalCost / 100, 2, ',', '.') }}</p>
+            <p class="value">R$ {{ number_format($totalCost, 2, ',', '.') }}</p>
             <p class="label">Faturamento</p>
         </div>
     </div>
@@ -56,7 +56,7 @@
                 <td>{{ $t->charger->name ?? $t->charger->identifier }}</td>
                 <td>{{ $t->rfid_card_id ? 'RFID' : 'Pix' }}</td>
                 <td>{{ number_format($t->energy_kwh, 2, ',', '.') }}</td>
-                <td>R$ {{ number_format($t->total_cost / 100, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($t->total_cost, 2, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>

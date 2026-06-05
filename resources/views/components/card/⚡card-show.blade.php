@@ -62,7 +62,7 @@ new #[Layout('layouts.app')] class extends Component
             </div>
             <p class="text-sm text-orange-200 mb-1">Saldo disponível</p>
             <p class="text-4xl font-medium text-white tracking-tight">
-                R$ {{ number_format($rfidCard->balance / 100, 2, ',', '.') }}
+                R$ {{ number_format($rfidCard->balance, 2, ',', '.') }}
             </p>
             <div class="flex items-center gap-1 mt-3">
                 <i class="ti ti-credit-card text-orange-200 text-sm"></i>
@@ -116,7 +116,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="border-t border-gray-100 pt-4 mb-4 space-y-2">
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-400">Recarga</span>
-                    <span class="text-gray-800">R$ {{ number_format($amount / 100, 2, ',', '.') }}</span>
+                    <span class="text-gray-800">R$ {{ number_format($amount, 2, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-400">Taxa de plataforma (1%)</span>
@@ -171,7 +171,7 @@ new #[Layout('layouts.app')] class extends Component
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-xs text-gray-400">{{ number_format($t->energy_kwh, 2, ',', '.') }} kWh</span>
-                    <span class="text-sm font-medium text-gray-800">R$ {{ number_format($t->total_cost / 100, 2, ',', '.') }}</span>
+                    <span class="text-sm font-medium text-gray-800">R$ {{ number_format($t->total_cost, 2, ',', '.') }}</span>
                 </div>
             </div>
             @empty

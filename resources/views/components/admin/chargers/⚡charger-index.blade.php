@@ -3,7 +3,7 @@ use App\Models\Charger;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.admin')] class extends Component
 {
     public string $identifier = '';
     public string $name = '';
@@ -104,7 +104,7 @@ new #[Layout('layouts.app')] class extends Component
                     type="number"
                     placeholder="99"
                     class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#FF8400]">
-                <p class="text-xs text-gray-400 mt-1">R$ {{ number_format($price_per_kwh / 100, 2, ',', '.') }} por kWh</p>
+                <p class="text-xs text-gray-400 mt-1">R$ {{ number_format($price_per_kwh, 2, ',', '.') }} por kWh</p>
                 @error('price_per_kwh')
                     <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                 @enderror
@@ -144,7 +144,7 @@ new #[Layout('layouts.app')] class extends Component
                     </span>
                 </div>
                 <div class="flex justify-between text-xs text-gray-400">
-                    <span>R$ {{ number_format($charger->price_per_kwh / 100, 2, ',', '.') }}/kWh</span>
+                    <span>R$ {{ number_format($charger->price_per_kwh, 2, ',', '.') }}/kWh</span>
                     <span>
                         {{ $charger->last_heartbeat ? 'Online ' . $charger->last_heartbeat->diffForHumans() : 'Nunca conectado' }}
                     </span>

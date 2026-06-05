@@ -59,7 +59,7 @@ new #[Layout('layouts.app')] class extends Component
             </div>
             <div class="flex justify-between text-sm">
                 <span class="text-gray-400">Valor consumido</span>
-                <span class="text-gray-800">R$ {{ number_format(($transaction->total_cost ?? 0) / 100, 2, ',', '.') }}</span>
+                <span class="text-gray-800">R$ {{ number_format(($transaction->total_cost ?? 0), 2, ',', '.') }}</span>
             </div>
             @if(!$transaction->rfid_card_id)
             <div class="flex justify-between text-sm">
@@ -71,16 +71,6 @@ new #[Layout('layouts.app')] class extends Component
                 <span class="text-gray-800">Total pago</span>
                 <span class="text-gray-800">R$ {{ number_format(($transaction->paid_amount ?? 0) / 100, 2, ',', '.') }}</span>
             </div>
-        </div>
-
-        {{-- Economia --}}
-        <div class="bg-orange-50 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
-            <i class="ti ti-leaf text-[#FF8400] text-xl flex-shrink-0"></i>
-            <p class="text-sm text-orange-700">
-                Você economizou aproximadamente
-                <strong>R$ {{ number_format((($transaction->energy_kwh ?? 0) * 0.6 * 6) - (($transaction->total_cost ?? 0) / 100), 2, ',', '.') }}</strong>
-                em combustível nesta recarga.
-            </p>
         </div>
 
         {{-- Compartilhar --}}

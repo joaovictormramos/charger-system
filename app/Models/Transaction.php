@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,6 +36,16 @@ class Transaction extends Model
         'stop_reason',
         'end_time',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'total_cost' => MoneyCast::class,
+            'paid_amount' => MoneyCast::class,
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
+    }
 
     public function charger(): BelongsTo
     {

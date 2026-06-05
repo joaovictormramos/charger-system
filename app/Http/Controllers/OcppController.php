@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OcppController extends Controller
 {
-    private const MINIMUM_BALANCE = 2000;
+    private const MINIMUM_BALANCE = 20;
     private const ALLOWED_ACTIONS = [
         'Authorize',
         'BootNotification',
@@ -99,7 +99,7 @@ class OcppController extends Controller
            return [];
         }
 
-        $currentMeter = (int) $energySample['value'];
+        $currentMeter = $energySample['value'];
         $energyKwh = ($currentMeter - $transaction->meter_start) / 1000;
 
         $transaction->update([
@@ -168,7 +168,7 @@ class OcppController extends Controller
 
         $meterStop  = (int) $payload['meterStop'];
         $energyKwh  = ($meterStop - $transaction->meter_start) / 1000;
-        $totalCost  = (int) round($energyKwh * $charger->price_per_kwh);
+        $totalCost  = round($energyKwh * $charger->price_per_kwh, 2);
 
         $transaction->update([
             'meter_stop'    => $meterStop,
@@ -179,7 +179,7 @@ class OcppController extends Controller
         ]);
 
         if ($rfidCard) {
-            $rfidCard->decrement('balance', $totalCost);
+            $rfidCard->update(['balance' => $rfidCard->balance - $totalCost]);
         }
 
         $charger->update(['status' => 'Available']);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -21,5 +22,12 @@ class RfidCard extends Model
     public function getRouteKeyName(): string
     {
         return 'uuid';
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'balance' => MoneyCast::class,
+        ];
     }
 }

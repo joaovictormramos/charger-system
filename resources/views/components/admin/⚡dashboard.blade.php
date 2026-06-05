@@ -4,8 +4,8 @@ use App\Models\Transaction;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
-new #[Layout('layouts.app')] class extends Component
-{
+new #[Layout('layouts.admin')] class extends Component{
+    
     public function with(): array
     {
         $chargers = Charger::with(['transactions' => function ($q) {
@@ -39,25 +39,7 @@ new #[Layout('layouts.app')] class extends Component
     {{-- Header --}}
     <div class="bg-white border-b border-gray-200 px-4 py-4">
         <h1 class="text-base font-medium text-gray-800">Dashboard</h1>
-        <p class="text-xs text-gray-400 mb-3">{{ now()->format('d \d\e F \d\e Y') }}</p>
-        <div class="flex gap-2 overflow-x-auto pb-1">
-            <a href="{{ route('admin.dashboard') }}"
-                class="flex items-center gap-1 px-3 py-2 bg-[#FF8400] text-white text-xs rounded-xl font-medium whitespace-nowrap">
-                <i class="ti ti-layout-dashboard"></i> Dashboard
-            </a>
-            <a href="{{ route('admin.chargers') }}"
-                class="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-600 text-xs rounded-xl font-medium whitespace-nowrap">
-                <i class="ti ti-plug"></i> Carregadores
-            </a>
-            <a href="{{ route('admin.transactions') }}"
-                class="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-600 text-xs rounded-xl font-medium whitespace-nowrap">
-                <i class="ti ti-receipt"></i> Transações
-            </a>
-            <a href="{{ route('admin.rfid-cards') }}"
-                class="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-600 text-xs rounded-xl font-medium whitespace-nowrap">
-                <i class="ti ti-credit-card"></i> Cartões
-            </a>
-        </div>
+        <p class="text-xs text-gray-400">{{ now()->format('d \d\e F \d\e Y') }}</p>
     </div>
 
     <div class="p-4 space-y-4">
@@ -94,7 +76,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <p class="text-xs text-gray-400 mb-1">Faturamento</p>
-                    <p class="text-xl font-medium text-gray-800">R$ {{ number_format($monthTotal / 100, 2, ',', '.') }}</p>
+                    <p class="text-xl font-medium text-gray-800">R$ {{ number_format($monthTotal, 2, ',', '.') }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 mb-1">kWh consumidos</p>
@@ -106,7 +88,7 @@ new #[Layout('layouts.app')] class extends Component
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 mb-1">Ticket médio</p>
-                    <p class="text-xl font-medium text-gray-800">R$ {{ number_format($monthAvgTicket / 100, 2, ',', '.') }}</p>
+                    <p class="text-xl font-medium text-gray-800">R$ {{ number_format($monthAvgTicket, 2, ',', '.') }}</p>
                 </div>
             </div>
         </div>
@@ -137,7 +119,7 @@ new #[Layout('layouts.app')] class extends Component
                     <p class="text-xs text-gray-800">{{ $t->start_time->format('d/m/Y H:i') }}</p>
                     <p class="text-xs text-gray-400">{{ number_format($t->energy_kwh, 2, ',', '.') }} kWh · {{ $t->rfid_card_id ? 'RFID' : 'Pix' }}</p>
                 </div>
-                <span class="text-sm font-medium text-gray-800">R$ {{ number_format($t->total_cost / 100, 2, ',', '.') }}</span>
+                <span class="text-sm font-medium text-gray-800">R$ {{ number_format($t->total_cost, 2, ',', '.') }}</span>
             </div>
             @empty
             <div class="px-4 py-3">

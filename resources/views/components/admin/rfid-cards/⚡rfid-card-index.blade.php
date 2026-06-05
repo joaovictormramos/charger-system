@@ -4,7 +4,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
 
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.admin')] class extends Component
 {
     use WithPagination;
 
@@ -138,7 +138,7 @@ new #[Layout('layouts.app')] class extends Component
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-gray-800">
-                        R$ {{ number_format($card->balance / 100, 2, ',', '.') }}
+                        R$ {{ number_format($card->balance, 2, ',', '.') }}
                     </span>
                     <button wire:click="toggleActive({{ $card->id }})"
                         class="text-xs px-2 py-1 rounded-lg font-medium

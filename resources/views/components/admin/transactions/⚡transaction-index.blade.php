@@ -5,7 +5,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.admin')] class extends Component
 {
     public string $startDate = '';
     public string $endDate = '';
@@ -116,7 +116,7 @@ new #[Layout('layouts.app')] class extends Component
             </div>
             <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
                 <p class="text-xs text-gray-400 mb-1">Faturado</p>
-                <p class="text-lg font-medium text-gray-800">R$ {{ number_format($totalCost / 100, 0, ',', '.') }}</p>
+                <p class="text-lg font-medium text-gray-800">R$ {{ number_format($totalCost, 0, ',', '.') }}</p>
             </div>
         </div>
 
@@ -126,7 +126,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="bg-white rounded-xl border border-gray-200 px-4 py-3">
                 <div class="flex justify-between items-start mb-1">
                     <span class="text-sm font-medium text-gray-800">{{ $t->charger->name ?? $t->charger->identifier }}</span>
-                    <span class="text-sm font-medium text-gray-800">R$ {{ number_format($t->total_cost / 100, 2, ',', '.') }}</span>
+                    <span class="text-sm font-medium text-gray-800">R$ {{ number_format($t->total_cost, 2, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between text-xs text-gray-400">
                     <span>{{ number_format($t->energy_kwh, 2, ',', '.') }} kWh · {{ $t->rfid_card_id ? 'RFID' : 'Pix' }}</span>
