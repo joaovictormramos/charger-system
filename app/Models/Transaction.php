@@ -34,6 +34,7 @@ class Transaction extends Model
         'total_cost',
         'paid_amount',
         'stop_reason',
+        'start_time',
         'end_time',
     ];
 

@@ -47,7 +47,7 @@ new #[Layout('layouts.app')] class extends Component
                 <span class="text-gray-400">Duração</span>
                 <span class="text-gray-800">
                     @if($transaction->end_time)
-                        {{ gmdate('H\h i\m', $transaction->end_time->diffInSeconds($transaction->start_time)) }}
+                        {{ (int) ($transaction->end_time->diffInSeconds($transaction->start_time) / 60) }}min
                     @else
                         —
                     @endif
@@ -69,14 +69,15 @@ new #[Layout('layouts.app')] class extends Component
             @endif
             <div class="flex justify-between text-sm font-medium pt-2 border-t border-gray-200">
                 <span class="text-gray-800">Total pago</span>
-                <span class="text-gray-800">R$ {{ number_format(($transaction->paid_amount ?? 0) / 100, 2, ',', '.') }}</span>
+                <span class="text-gray-800">R$ {{ number_format($transaction->paid_amount ?? 0, 2, ',', '.') }}</span>
             </div>
         </div>
 
         {{-- Compartilhar --}}
-        <button onclick="navigator.share && navigator.share({title:'Comprovante', text:'Recarga concluída: {{ number_format($transaction->energy_kwh ?? 0, 2, ',', '.') }} kWh por R$ {{ number_format(($transaction->paid_amount ?? 0) / 100, 2, ',', '.') }}'})"
-            class="w-full py-4 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium flex items-center justify-center gap-2">
-            <i class="ti ti-share text-lg"></i>
+        @php
+            $shareText = 'Recarga concluída: ' . number_format($transaction->energy_kwh ?? 0, 2, ',', '.') . ' kWh por R$ ' . number_format($transaction->paid_amount ?? 0, 2, ',', '.');
+        @endphp
+        <button onclick="navigator.share && navigator.share({title:'Comprovante', text:'{{ $shareText }}'})">
             Compartilhar comprovante
         </button>
 
