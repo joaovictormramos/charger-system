@@ -23,7 +23,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::livewire('/carregadores', 'admin.chargers.charger-index')->name('admin.chargers');
     Route::livewire('/transacoes', 'admin.transactions.transaction-index')->name('admin.transactions');
-    Route::livewire('/', 'admin.dashboard')->name('admin.dashboard');
+    Route::livewire('/dashboard', 'admin.dashboard')->name('admin.dashboard');
     Route::livewire('/cartoes', 'admin.rfid-cards.rfid-card-index')->name('admin.rfid-cards');
     Route::get('/charger/{charger}/configuration', [ChargerController::class, 'configuration']);
 });

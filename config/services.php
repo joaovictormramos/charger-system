@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'abacatepay' => [
+        'key' => env('ABACATEPAY_KEY'),
+    ],
+
 ];
